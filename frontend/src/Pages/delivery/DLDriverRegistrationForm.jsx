@@ -80,13 +80,16 @@ const RegisterDriverForm = () => {
         if (name === 'email') {
             // Remove any leading or trailing spaces
             const trimmedValue = value.trim()
-        
+
             // Check if there are any spaces in the email
             if (/\s/.test(trimmedValue)) {
                 errorMessage = 'Email cannot contain spaces.'
             } else if (!/^.*@gmail\.com$/.test(trimmedValue)) {
                 errorMessage = 'Email must be a valid @gmail.com address.'
-            } else if (trimmedValue.length > 10 && !trimmedValue.endsWith('@gmail.com')) {
+            } else if (
+                trimmedValue.length > 10 &&
+                !trimmedValue.endsWith('@gmail.com')
+            ) {
                 errorMessage = 'Email cannot contain characters after .com'
             }
         }
@@ -96,10 +99,11 @@ const RegisterDriverForm = () => {
             if (!/^\d*$/.test(value)) {
                 return // Prevent typing anything other than numbers
             }
-        
+
             // Ensure the phone number is 10 digits and starts with 0
             if (!/^0\d{9}$/.test(value)) {
-                errorMessage = 'Contact number must be 10 digits and start with 0.'
+                errorMessage =
+                    'Contact number must be 10 digits and start with 0.'
             }
         }
 
@@ -132,30 +136,26 @@ const RegisterDriverForm = () => {
                 errorMessage = 'Please Enter valid NIC'
             }
         }
-  // Validate Vehicle Number
-  if (name === 'vehicleNumber') {
-    const vehicleRegex6 = /^[A-Z]{2}[0-9]{4}$/  // For 6 characters (AA0000 to ZZ9999)
-    const vehicleRegex7 = /^[A-Z]{3}[0-9]{4}$/  // For 7 characters (AAA0000 to ZZZ9999)
+        // Validate Vehicle Number
+        if (name === 'vehicleNumber') {
+            const vehicleRegex6 = /^[A-Z]{2}[0-9]{4}$/ // For 6 characters (AA0000 to ZZ9999)
+            const vehicleRegex7 = /^[A-Z]{3}[0-9]{4}$/ // For 7 characters (AAA0000 to ZZZ9999)
 
-    if (!(vehicleRegex6.test(value) || vehicleRegex7.test(value))) {
-        errorMessage =
-            'Vehicle number must be in uppercase and follow the format AA0000 or AAA0000.'
-    }
-}
+            if (!(vehicleRegex6.test(value) || vehicleRegex7.test(value))) {
+                errorMessage =
+                    'Vehicle number must be in uppercase and follow the format AA0000 or AAA0000.'
+            }
+        }
 
+        // Validate Vehicle Number
+        if (name === 'licenseCardNumber') {
+            const vehicleRegex6 = /^[A-B]{1}[0-9]{6}$/ // For 6 characters (AA0000 to ZZ9999)
 
-
-
-
-// Validate Vehicle Number
-if (name === 'licenseCardNumber') {
-    const vehicleRegex6 = /^[A-B]{1}[0-9]{6}$/  // For 6 characters (AA0000 to ZZ9999)
-
-    if (!(vehicleRegex6.test(value) )) {
-        errorMessage =
-            'licenseCardNumber must be in uppercase and follow the format A000000 .'
-    }
-}
+            if (!vehicleRegex6.test(value)) {
+                errorMessage =
+                    'licenseCardNumber must be in uppercase and follow the format A000000 .'
+            }
+        }
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
@@ -167,58 +167,57 @@ if (name === 'licenseCardNumber') {
         }))
     }
 
-// Handle image file changes, upload to Cloudinary, and set previews with validation
-const handleFileChange = async (
-    e,
-    setImageUrlFunction,
-    setPreviewFunction,
-    type
-) => {
-    const file = e.target.files[0]
-    const validFileTypes = ['image/png', 'image/jpeg', 'image/jpg']
+    // Handle image file changes, upload to Cloudinary, and set previews with validation
+    const handleFileChange = async (
+        e,
+        setImageUrlFunction,
+        setPreviewFunction,
+        type
+    ) => {
+        const file = e.target.files[0]
+        const validFileTypes = ['image/png', 'image/jpeg', 'image/jpg']
 
-    if (file) {
-        // Check if file type is valid
-        if (!validFileTypes.includes(file.type)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid File Type',
-                text: 'Please upload a valid image file (PNG or JPEG).',
-            })
-            return // Exit if invalid file type
-        }
+        if (file) {
+            // Check if file type is valid
+            if (!validFileTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid File Type',
+                    text: 'Please upload a valid image file (PNG or JPEG).',
+                })
+                return // Exit if invalid file type
+            }
 
-        setPreviewFunction(URL.createObjectURL(file)) // Set preview URL
-        setLoading({ ...loading, [type]: true }) // Set loading state
+            setPreviewFunction(URL.createObjectURL(file)) // Set preview URL
+            setLoading({ ...loading, [type]: true }) // Set loading state
 
-        try {
-            const formData = new FormData()
-            formData.append('image', file)
-            formData.append('folder', 'drivers') // Upload to "drivers" folder in Cloudinary
+            try {
+                const formData = new FormData()
+                formData.append('image', file)
+                formData.append('folder', 'drivers') // Upload to "drivers" folder in Cloudinary
 
-            const response = await axios.post('/images', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
+                const response = await axios.post('/images', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
 
-            setImageUrlFunction(response.data.url) // Set Cloudinary image URL
-            Swal.fire({
-                icon: 'success',
-                title: `${type} uploaded successfully!`,
-            })
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Upload Error',
-                text: 'Failed to upload image. Please try again.',
-            })
-        } finally {
-            setLoading({ ...loading, [type]: false }) // Remove loading state
+                setImageUrlFunction(response.data.url) // Set Cloudinary image URL
+                Swal.fire({
+                    icon: 'success',
+                    title: `${type} uploaded successfully!`,
+                })
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Upload Error',
+                    text: 'Failed to upload image. Please try again.',
+                })
+            } finally {
+                setLoading({ ...loading, [type]: false }) // Remove loading state
+            }
         }
     }
-}
-
 
     // Handle form submission
     const handleSubmit = async (e) => {
@@ -401,12 +400,11 @@ const handleFileChange = async (
                                 className="mt-1 block w-full px-4 py-2 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-lime-400"
                                 required
                             />
-{errors.licenseCardNumber && (
+                            {errors.licenseCardNumber && (
                                 <p className="text-red-500 text-sm">
                                     {errors.licenseCardNumber}
                                 </p>
                             )}
-
                         </div>
 
                         <div className="col-span-2">
