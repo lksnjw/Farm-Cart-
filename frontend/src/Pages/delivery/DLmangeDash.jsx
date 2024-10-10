@@ -4,7 +4,6 @@ import DLmanageSidebar from '../../Components/delivery/DLmanageSidebar' // Sideb
 import { useNavigate } from 'react-router-dom' // For navigating between pages
 import Loading from '../../Components/Loading'
 
-
 const DLmanageDash = () => {
     const [stats, setStats] = useState({
         totalDrivers: 0,
@@ -87,9 +86,11 @@ const DLmanageDash = () => {
     }, [])
 
     if (loading) {
-        return <div className="flex flex-1 min-h-screen justify-center items-center">
-        <Loading />
-    </div> // Display a loading message while fetching data
+        return (
+            <div className="flex flex-1 min-h-screen justify-center items-center">
+                <Loading />
+            </div>
+        ) // Display a loading message while fetching data
     }
 
     if (error) {
