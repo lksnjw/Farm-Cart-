@@ -33,6 +33,7 @@ import {
     startSyncDeliveryOrderStatus,
 } from './controllers/DLOcontroller.js' // Import the periodic check
 
+
 // Production-only delivery task scheduling
 if (process.env.SERVER_ENV === 'production') {
     checkForAvailableDrivers()
@@ -40,6 +41,7 @@ if (process.env.SERVER_ENV === 'production') {
     startSyncDeliveryOrderStatus()
     cleanUpDuplicateDeliveries()
 }
+
 
 
 import { errorHandler, notFound } from './middlewares/errorMiddleware.js'
